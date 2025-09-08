@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>HTMLプレビューアプリ</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #fdfdfd;
+    }
+    h1 {
+      font-size: 20px;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-family: monospace;
+      font-size: 14px;
+      padding: 10px;
+      box-sizing: border-box;
+      resize: vertical;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+    }
+    select {
+      width: 100%;
+      margin-top: 12px;
+      padding: 10px;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background: #fff;
+    }
+
+    section {
+      margin-top: 24px;
+    }
+
+    h2 {
+      font-size: 16px;
+      margin-bottom: 8px;
+      color: #444;
+    }
+
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    button {
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 8px;
+      background: #4a90e2;
+      color: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: background 0.2s ease, transform 0.1s ease;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #357ab8;
+      transform: scale(1.03);
+    }
+
+    iframe {
+      width: 100%;
+      height: 300px;
+      border: 1px solid #ccc;
+      margin-top: 16px;
+      background: white;
+      border-radius: 8px;
+    }
+
+    #fullscreen-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: white;
+      z-index: 9999;
+      display: none;
+      flex-direction: column;
+    }
+
+    #fullscreen-iframe {
+      flex: 1;
+      border: none;
+    }
+
+    #exit-fullscreen {
+      background: #333;
+      color: white;
+      padding: 10px;
+      text-align: right;
+      font-size: 14px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>HTMLプレビューアプリ</h1>
+
+  <textarea id="html-input" placeholder="ここにHTMLコードを入力してください"></textarea>
+
+  <select id="slot-select">
+    <option value="slot1">スロット1</option>
+    <option value="slot2">スロット2</option>
+    <option value="slot3">スロット3</option>
+    <option value="slot4">スロット4</option>
+    <option value="slot5">スロット5</option>
+  </select>
+
+  <!-- 🔽 機能別にセクション分けしたボタン群 🔽 -->
+
+  <section>
+    <h2>📁 保存・読み込み</h2>
+    <div class="button-grid">
+      <button onclick="saveCode()">💾 保存</button>
+      <button onclick="loadCode()">📂 読み込み</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>🖥️ 表示操作</h2>
+    <div class="button-grid">
+      <button onclick="renderPreview()">▶️ プレビュー</button>
+      <button onclick="enterFullscreen()">🔳 フルスクリーン</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>🛠️ 補助機能</h2>
+    <div class="button-grid">
+      <button onclick="copyCode()">📋 コピー</button>
+      <button onclick="clearCode()">🧹 クリア</button>
+    </div>
+  </section>
+
+  <!-- 🔼 ボタン群ここまで 🔼 -->
+
+  <iframe id="preview-frame"></iframe>
+
+  <div id="fullscreen-overlay">
+    <div id="exit-fullscreen" onclick="exitFullscreen()">⏎ フルスクリーン解除</div>
+    <iframe id="fullscreen-iframe"></iframe>
+  </div>
+
+  <script>
+    function saveCode() {
+      const slot = document.getElementById('slot-select').value;
+      const html = document.getElementById('html-input').value;
+      localStorage.setItem(`html_${slot}`, html);
+      alert(`コードを${slot}に保存しました`);
+    }
+
+    function loadCode() {
+      const slot = document.getElementById('slot-select').value;
+      const html = localStorage.getItem(`html_${slot}`);
+      if (html !== null) {
+        document.getElementById('html-input').value = html;
+        alert(`${slot}からコードを読み込みました`);
+      } else {
+        alert(`${slot}には保存されたコードがありません`);
+      }
+    }
+
+    function renderPreview() {
+      const html = document.getElementById('html-input').value;
+      const previewFrame = document.getElementById('preview-frame');
+
+      const newFrame = document.createElement('iframe');
+      newFrame.id = 'preview-frame';
+      newFrame.style.width = '100%';
+      newFrame.style.height = '300px';
+      newFrame.style.border = '1px solid #ccc';
+      newFrame.style.borderRadius = '8px';
+
+      previewFrame.parentNode.replaceChild(newFrame, previewFrame);
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      newFrame.src = url;
+
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    function enterFullscreen() {
+      const html = document.getElementById('html-input').value;
+      const fullscreenIframe = document.getElementById('fullscreen-iframe');
+      const overlay = document.getElementById('fullscreen-overlay');
+
+      const newFrame = document.createElement('iframe');
+      newFrame.id = 'fullscreen-iframe';
+      newFrame.style.flex = '1';
+      newFrame.style.border = 'none';
+
+      fullscreenIframe.parentNode.replaceChild(newFrame, fullscreenIframe);
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      newFrame.src = url;
+
+      overlay.style.display = 'flex';
+
+      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    }
+
+    function exitFullscreen() {
+      document.getElementById('fullscreen-overlay').style.display = 'none';
+    }
+
+    function copyCode() {
+      const textarea = document.getElementById('html-input');
+      textarea.select();
+      document.execCommand('copy');
+      alert('コードをコピーしました！');
+    }
+
+    function clearCode() {
+      const textarea = document.getElementById('html-input');
+      if (confirm('入力内容をすべて消去しますか？')) {
+        textarea.value = '';
+      }
+    }
+  </script>
+
+</body>
+</html>
