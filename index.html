@@ -143,6 +143,7 @@
     <div class="button-grid">
       <button onclick="copyCode()">📋 コピー</button>
       <button onclick="clearCode()">🧹 クリア</button>
+      <button onclick="pasteCode()">📥 ペースト</button>
     </div>
   </section>
 
@@ -156,6 +157,7 @@
   </div>
 
   <script>
+    // 保存：選択中のスロットに textarea の中身を保存
     function saveCode() {
       const slot = document.getElementById('slot-select').value;
       const html = document.getElementById('html-input').value;
@@ -163,6 +165,7 @@
       alert(`コードを${slot}に保存しました`);
     }
 
+    // 読み込み：選択中のスロットから textarea に読み込む
     function loadCode() {
       const slot = document.getElementById('slot-select').value;
       const html = localStorage.getItem(`html_${slot}`);
@@ -174,6 +177,7 @@
       }
     }
 
+    // プレビュー：iframe を差し替えて Blob URL で表示する
     function renderPreview() {
       const html = document.getElementById('html-input').value;
       const previewFrame = document.getElementById('preview-frame');
@@ -191,9 +195,11 @@
       const url = URL.createObjectURL(blob);
       newFrame.src = url;
 
+      // メモリ解放（短時間後）
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
+    // フルスクリーン表示（オーバーレイ内の iframe を差し替え）
     function enterFullscreen() {
       const html = document.getElementById('html-input').value;
       const fullscreenIframe = document.getElementById('fullscreen-iframe');
@@ -219,19 +225,68 @@
       document.getElementById('fullscreen-overlay').style.display = 'none';
     }
 
+    // クリップボードへコピー（従来方式）
     function copyCode() {
       const textarea = document.getElementById('html-input');
       textarea.select();
-      document.execCommand('copy');
-      alert('コードをコピーしました！');
+      try {
+        document.execCommand('copy');
+        alert('コードをコピーしました！');
+      } catch (err) {
+        // フォールバック：navigator.clipboard が使える場合はそちらを試す
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(textarea.value).then(() => {
+            alert('コードをコピーしました！');
+          }).catch(e => {
+            alert('コピーに失敗しました: ' + e);
+          });
+        } else {
+          alert('コピーに失敗しました（ブラウザが対応していない可能性があります）');
+        }
+      }
+      // 選択解除（見た目のため）
+      try { window.getSelection().removeAllRanges(); } catch(e){}
     }
 
+    // クリア：確認してから textarea を空にする
     function clearCode() {
       const textarea = document.getElementById('html-input');
       if (confirm('入力内容をすべて消去しますか？')) {
         textarea.value = '';
       }
     }
+
+    // ペースト：クリアしてからクリップボードのテキストを貼り付ける
+    async function pasteCode() {
+      const textarea = document.getElementById('html-input');
+
+      // クリア（仕様どおり最初にクリア）
+      textarea.value = '';
+
+      // navigator.clipboard.readText を使ってクリップボード読み取り
+      if (navigator.clipboard && navigator.clipboard.readText) {
+        try {
+          const text = await navigator.clipboard.readText();
+          textarea.value = text;
+          alert('クリップボードの内容を貼り付けました！');
+        } catch (err) {
+          // 失敗時の案内
+          alert('クリップボードの読み取りに失敗しました。\n' +
+                'ページが HTTPS でない場合や、ブラウザの権限が必要です。\n' +
+                'エラー: ' + err);
+        }
+      } else {
+        // 古いブラウザや権限のない環境向けのフォールバック案内
+        alert('このブラウザではクリップボード読み取りがサポートされていません。\n' +
+              '（HTTPS 環境か、別のブラウザでお試しください）');
+      }
+    }
+
+    // ページ読み込み時に簡単なヒントを表示（任意：不要なら削除可）
+    // window.addEventListener('load', () => {
+    //   console.log('ヒント: ペースト機能は HTTPS または localhost で動作します。');
+    // });
+
   </script>
 
 </body>
