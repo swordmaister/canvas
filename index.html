@@ -4,6 +4,13 @@
   <meta charset="UTF-8">
   <title>HTMLプレビューアプリ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="HTMLプレビュー">
+  <meta name="theme-color" content="#4a90e2">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+
   <style>
     body {
       font-family: 'Helvetica Neue', sans-serif;
@@ -120,8 +127,6 @@
     <option value="slot5">スロット5</option>
   </select>
 
-  <!-- 🔽 機能別にセクション分けしたボタン群 🔽 -->
-
   <section>
     <h2>📁 保存・読み込み</h2>
     <div class="button-grid">
@@ -146,8 +151,6 @@
       <button onclick="pasteCode()">📥 ペースト</button>
     </div>
   </section>
-
-  <!-- 🔼 ボタン群ここまで 🔼 -->
 
   <iframe id="preview-frame"></iframe>
 
@@ -282,10 +285,18 @@
       }
     }
 
-    // ページ読み込み時に簡単なヒントを表示（任意：不要なら削除可）
-    // window.addEventListener('load', () => {
-    //   console.log('ヒント: ペースト機能は HTTPS または localhost で動作します。');
-    // });
+    // 💡 サービスワーカーの登録スクリプトを追加
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('Service Worker 登録成功: ', registration.scope);
+          })
+          .catch(err => {
+            console.error('Service Worker 登録失敗: ', err);
+          });
+      });
+    }
 
   </script>
 
