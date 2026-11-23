@@ -2,113 +2,51 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>HTMLプレビューアプリ</title>
+  <title>HTMLプレビュー＆データ管理スタジオ</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {
-      font-family: 'Helvetica Neue', sans-serif;
-      margin: 0;
-      padding: 16px;
-      background: #fdfdfd;
-    }
-    h1 {
-      font-size: 20px;
-      margin-bottom: 12px;
-      text-align: center;
-    }
-    textarea {
-      width: 100%;
-      height: 200px;
-      font-family: monospace;
-      font-size: 14px;
-      padding: 10px;
-      box-sizing: border-box;
-      resize: vertical;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #fff;
-    }
-    select {
-      width: 100%;
-      margin-top: 12px;
-      padding: 10px;
-      font-size: 14px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-    }
-
-    section {
-      margin-top: 24px;
-    }
-
-    h2 {
-      font-size: 16px;
-      margin-bottom: 8px;
-      color: #444;
-    }
-
-    .button-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
-    }
-
-    button {
-      padding: 10px;
-      font-size: 14px;
-      border: none;
-      border-radius: 8px;
-      background: #4a90e2;
-      color: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: background 0.2s ease, transform 0.1s ease;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #357ab8;
-      transform: scale(1.03);
-    }
-
-    iframe {
-      width: 100%;
-      height: 300px;
-      border: 1px solid #ccc;
-      margin-top: 16px;
-      background: white;
-      border-radius: 8px;
-    }
-
-    #fullscreen-overlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: white;
-      z-index: 9999;
-      display: none;
-      flex-direction: column;
-    }
-
-    #fullscreen-iframe {
-      flex: 1;
-      border: none;
-    }
-
-    #exit-fullscreen {
-      background: #333;
-      color: white;
-      padding: 10px;
-      text-align: right;
-      font-size: 14px;
-      cursor: pointer;
-    }
+    body { font-family: 'Helvetica Neue', sans-serif; margin: 0; padding: 16px; background: #fdfdfd; color: #333; }
+    h1 { font-size: 20px; margin-bottom: 12px; text-align: center; }
+    textarea { width: 100%; height: 200px; font-family: monospace; font-size: 14px; padding: 10px; box-sizing: border-box; resize: vertical; border: 1px solid #ccc; border-radius: 8px; background: #fff; }
+    select, input[type="text"] { width: 100%; margin-top: 8px; padding: 10px; font-size: 14px; border-radius: 8px; border: 1px solid #ccc; background: #fff; box-sizing: border-box; }
+    section { margin-top: 24px; }
+    h2 { font-size: 16px; margin-bottom: 8px; color: #444; border-left: 4px solid #4a90e2; padding-left: 8px; }
+    .button-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-top: 10px; }
+    button { padding: 10px; font-size: 13px; font-weight: bold; border: none; border-radius: 8px; background: #4a90e2; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.2s ease, transform 0.1s ease; cursor: pointer; }
+    button:hover { background: #357ab8; transform: scale(1.02); }
+    .box-panel { background: #f4f6f9; border: 1px solid #dce1e8; border-radius: 8px; padding: 12px; font-size: 13px; }
+    .storage-bar-bg { width: 100%; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; margin: 8px 0; }
+    .storage-bar-fill { height: 100%; width: 0%; background: #4a90e2; transition: width 0.3s ease, background 0.3s ease; }
+    .storage-list { margin-top: 12px; max-height: 300px; overflow-y: auto; border: 1px solid #dce1e8; border-radius: 6px; background: #fff; }
+    .storage-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #eee; gap: 8px; }
+    .storage-item:last-child { border-bottom: none; }
+    .storage-item-info { flex: 1; min-width: 0; }
+    .storage-key-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; color: #fff; font-weight: bold; flex-shrink: 0; }
+    .badge-slot { background: #4a90e2; }
+    .badge-linked { background: #27ae60; }
+    .badge-shared { background: #8e44ad; }
+    .badge-orphan { background: #e67e22; }
+    .storage-key-name { font-weight: bold; font-family: monospace; font-size: 13px; word-break: break-all; }
+    .storage-preview-val { font-size: 11px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: monospace; }
+    .btn-del-single { background: #e74c3c; padding: 6px 10px; font-size: 12px; }
+    .btn-del-single:hover { background: #c0392b; }
+    .btn-green { background: #27ae60; } .btn-green:hover { background: #219150; }
+    .btn-purple { background: #8e44ad; } .btn-purple:hover { background: #732d91; }
+    .btn-warn { background: #e67e22; } .btn-warn:hover { background: #d35400; }
+    .btn-danger { background: #c0392b; } .btn-danger:hover { background: #962d22; }
+    #preview-frame { width: 100%; height: 300px; border: 1px solid #ccc; margin-top: 16px; background: white; border-radius: 8px; box-sizing: border-box; }
+    #fullscreen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; display: none; flex-direction: column; }
+    #fullscreen-iframe { flex: 1; border: none; }
+    #exit-fullscreen { background: #333; color: white; padding: 10px; text-align: right; font-size: 14px; cursor: pointer; }
+    #toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); max-width: 90%; background: #333; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.2s, transform 0.2s; z-index: 10000; white-space: pre-line; }
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.error { background: #c0392b; }
   </style>
 </head>
 <body>
 
-  <h1>HTMLプレビューアプリ</h1>
+  <h1>HTMLプレビュー＆データ管理スタジオ</h1>
 
   <textarea id="html-input" placeholder="ここにHTMLコードを入力してください"></textarea>
 
@@ -120,13 +58,28 @@
     <option value="slot5">スロット5</option>
   </select>
 
-  <!-- 🔽 機能別にセクション分けしたボタン群 🔽 -->
+  <section>
+    <h2>📁 ブラウザ内スロット保存・読み込み</h2>
+    <div class="button-grid">
+      <button onclick="saveCode()">💾 スロットに保存</button>
+      <button onclick="loadCode()">📂 スロットから読込</button>
+    </div>
+  </section>
 
   <section>
-    <h2>📁 保存・読み込み</h2>
-    <div class="button-grid">
-      <button onclick="saveCode()">💾 保存</button>
-      <button onclick="loadCode()">📂 読み込み</button>
+    <h2>💽 端末ローカルへファイル保存・復元（形ズレ防止）</h2>
+    <div class="box-panel">
+      <label for="file-name-input" style="font-weight: bold; font-size: 12px;">保存ファイル名（拡張子 .html / .json 等を指定可）:</label>
+      <input type="text" id="file-name-input" placeholder="例: my_app.html または game_backup.json" value="app.html">
+      <div class="button-grid">
+        <button class="btn-green" onclick="downloadHTMLFile()">⬇️ HTML単体で保存</button>
+        <button class="btn-purple" onclick="downloadPackageFile()">📦 コード＋データ一括保存</button>
+        <button onclick="triggerFileLoad()">⬆️ ローカルファイルを読込</button>
+      </div>
+      <div style="font-size: 11px; color: #666; margin-top: 8px;">
+        ※「一括保存(.json)」を使うと、HTMLコードと関連するセーブデータを形ズレなく丸ごとバックアップ・復元できます。
+      </div>
+      <input type="file" id="file-loader" accept=".html,.htm,.txt,.json" style="display: none;" onchange="handleFileLoad(event)">
     </div>
   </section>
 
@@ -147,7 +100,20 @@
     </div>
   </section>
 
-  <!-- 🔼 ボタン群ここまで 🔼 -->
+  <section>
+    <h2>🔍 保存データ一覧・スロット紐づけ診断</h2>
+    <div class="box-panel">
+      <div id="storage-text">計算中...</div>
+      <div class="storage-bar-bg"><div id="storage-bar" class="storage-bar-fill"></div></div>
+      <div id="storage-detail" style="font-size: 12px; color: #555;"></div>
+      <div id="storage-list" class="storage-list"></div>
+      <div class="button-grid">
+        <button class="btn-green" onclick="updateStorageInspector()">🔄 最新状態に更新</button>
+        <button class="btn-warn" onclick="clearAppGarbage()">🧹 スロット以外を一括消去</button>
+        <button class="btn-danger" onclick="clearAllStorage()">⚠️ 全データ初期化</button>
+      </div>
+    </div>
+  </section>
 
   <iframe id="preview-frame"></iframe>
 
@@ -156,138 +122,350 @@
     <iframe id="fullscreen-iframe"></iframe>
   </div>
 
+  <div id="toast" role="status" aria-live="polite"></div>
+
   <script>
-    // 保存：選択中のスロットに textarea の中身を保存
-    function saveCode() {
-      const slot = document.getElementById('slot-select').value;
-      const html = document.getElementById('html-input').value;
-      localStorage.setItem(`html_${slot}`, html);
-      alert(`コードを${slot}に保存しました`);
+    const SLOT_KEY_RE = /^html_slot[1-5]$/;
+    const isSlotKey = k => SLOT_KEY_RE.test(k);
+    const $ = id => document.getElementById(id);
+
+    // ---------- 共通 ----------
+    let toastTimer;
+    function toast(msg, isError) {
+      const el = $('toast');
+      el.textContent = msg;
+      el.classList.toggle('error', !!isError);
+      el.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.remove('show'), isError ? 4500 : 2200);
     }
 
-    // 読み込み：選択中のスロットから textarea に読み込む
-    function loadCode() {
-      const slot = document.getElementById('slot-select').value;
-      const html = localStorage.getItem(`html_${slot}`);
-      if (html !== null) {
-        document.getElementById('html-input').value = html;
-        alert(`${slot}からコードを読み込みました`);
-      } else {
-        alert(`${slot}には保存されたコードがありません`);
+    function escapeHTML(str) {
+      return String(str).replace(/[&<>"']/g, m => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+      }[m]));
+    }
+
+    // ---------- キー抽出（静的解析） ----------
+    // 戻り値: { keys: string[], dynamic: boolean }
+    function analyzeKeys(code) {
+      const keys = new Set();
+      let dynamic = false;
+      if (!code) return { keys: [], dynamic };
+
+      // const KEY = 'xxx' 形式の定数を収集
+      const consts = {};
+      const constRe = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=\s*(['"`])([^'"`$\n]*)\2/g;
+      let m;
+      while ((m = constRe.exec(code)) !== null) consts[m[1]] = m[3];
+
+      // localStorage.setItem/getItem/removeItem(第1引数)
+      const callRe = /localStorage\.(?:setItem|getItem|removeItem)\s*\(\s*([^,)]+)/g;
+      while ((m = callRe.exec(code)) !== null) {
+        const arg = m[1].trim();
+        let lit = arg.match(/^(['"`])([^'"`$\n]*)\1$/);
+        if (lit) { keys.add(lit[2]); continue; }
+        if (/^[A-Za-z_$][\w$]*$/.test(arg) && consts[arg] !== undefined) { keys.add(consts[arg]); continue; }
+        dynamic = true; // テンプレート式・結合・不明な変数
+      }
+
+      // localStorage['key'] / localStorage.key 形式
+      const bracketRe = /localStorage\[\s*(['"])([^'"]+)\1\s*\]/g;
+      while ((m = bracketRe.exec(code)) !== null) keys.add(m[2]);
+
+      return { keys: Array.from(keys), dynamic };
+    }
+    const extractKeysFromCode = code => analyzeKeys(code).keys;
+
+    function buildKeySlotMap() {
+      const map = {};
+      for (let i = 1; i <= 5; i++) {
+        extractKeysFromCode(localStorage.getItem(`html_slot${i}`)).forEach(k => {
+          (map[k] = map[k] || []).push(`スロット${i}`);
+        });
+      }
+      extractKeysFromCode($('html-input').value).forEach(k => {
+        (map[k] = map[k] || []);
+        if (!map[k].includes('編集中')) map[k].push('編集中');
+      });
+      return map;
+    }
+
+    // ---------- ストレージ診断 ----------
+    function updateStorageInspector() {
+      let totalBytes = 0, slotBytes = 0, otherKeysCount = 0;
+      const items = [];
+      const keySlotMap = buildKeySlotMap();
+
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const value = localStorage.getItem(key) || '';
+        const itemBytes = (key.length + value.length) * 2;
+        totalBytes += itemBytes;
+        const slot = isSlotKey(key);
+        if (slot) slotBytes += itemBytes; else otherKeysCount++;
+        items.push({ key, value, bytes: itemBytes, isSlot: slot, usedBy: keySlotMap[key] || [] });
+      }
+
+      items.sort((a, b) => (a.isSlot !== b.isSlot) ? (a.isSlot ? 1 : -1) : a.key.localeCompare(b.key));
+
+      const maxBytes = 5 * 1024 * 1024;
+      const percent = Math.min((totalBytes / maxBytes) * 100, 100).toFixed(1);
+      $('storage-text').textContent =
+        `合計使用量: ${(totalBytes / 1024).toFixed(2)} KB / 約5,120 KB (${percent}%)`;
+      $('storage-detail').textContent =
+        `内訳: スロット ${(slotBytes / 1024).toFixed(2)} KB ｜ アプリデータ等 ${((totalBytes - slotBytes) / 1024).toFixed(2)} KB (${otherKeysCount}件)`;
+
+      const bar = $('storage-bar');
+      bar.style.width = `${percent}%`;
+      bar.style.background = percent > 80 ? '#e74c3c' : (percent > 50 ? '#e67e22' : '#4a90e2');
+
+      const listEl = $('storage-list');
+      if (items.length === 0) {
+        listEl.innerHTML = '<div style="padding: 12px; text-align: center; color: #888;">保存されているデータはありません</div>';
+        return;
+      }
+
+      listEl.innerHTML = items.map(item => {
+        let badge;
+        if (item.isSlot) badge = '<span class="badge badge-slot">コード本体</span>';
+        else if (item.usedBy.length > 1) badge = `<span class="badge badge-shared">⚠️ 共有中: ${escapeHTML(item.usedBy.join(' & '))}</span>`;
+        else if (item.usedBy.length === 1) badge = `<span class="badge badge-linked">🔗 使用: ${escapeHTML(item.usedBy[0])}</span>`;
+        else badge = '<span class="badge badge-orphan">❓ 紐づけ不明/過去データ</span>';
+
+        const preview = escapeHTML(item.value.slice(0, 80).replace(/\s+/g, ' '));
+        return `
+          <div class="storage-item">
+            <div class="storage-item-info">
+              <div class="storage-key-row">
+                ${badge}
+                <span class="storage-key-name">${escapeHTML(item.key)}</span>
+                <span style="font-size: 11px; color: #555;">(${(item.bytes / 1024).toFixed(2)} KB)</span>
+              </div>
+              <div class="storage-preview-val">${preview || '(空のデータ)'}</div>
+            </div>
+            <button class="btn-del-single" data-key="${escapeHTML(item.key)}">削除</button>
+          </div>`;
+      }).join('');
+    }
+
+    // 削除ボタン：イベント委譲（キー名をHTML属性に安全に保持）
+    $('storage-list').addEventListener('click', e => {
+      const btn = e.target.closest('.btn-del-single');
+      if (!btn) return;
+      const key = btn.dataset.key;
+      if (confirm(`キー「${key}」を削除しますか？`)) {
+        localStorage.removeItem(key);
+        updateStorageInspector();
+        toast('削除しました');
+      }
+    });
+
+    function clearAppGarbage() {
+      const keys = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (!isSlotKey(k)) keys.push(k);
+      }
+      if (keys.length === 0) { toast('消去するスロット以外のデータはありません'); return; }
+      if (confirm(`スロット以外のデータ（${keys.length}件）をすべて消去しますか？\n※スロット1〜5のコードは保護されます。`)) {
+        keys.forEach(k => localStorage.removeItem(k));
+        updateStorageInspector();
+        toast('スロット以外のデータを消去しました');
       }
     }
 
-    // プレビュー：iframe を差し替えて Blob URL で表示する
-    function renderPreview() {
-      const html = document.getElementById('html-input').value;
-      const previewFrame = document.getElementById('preview-frame');
-
-      const newFrame = document.createElement('iframe');
-      newFrame.id = 'preview-frame';
-      newFrame.style.width = '100%';
-      newFrame.style.height = '300px';
-      newFrame.style.border = '1px solid #ccc';
-      newFrame.style.borderRadius = '8px';
-
-      previewFrame.parentNode.replaceChild(newFrame, previewFrame);
-
-      const blob = new Blob([html], { type: 'text/html' });
-      const url = URL.createObjectURL(blob);
-      newFrame.src = url;
-
-      // メモリ解放（短時間後）
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    function clearAllStorage() {
+      if (confirm('【警告】localStorage内のすべてのデータを消去しますか？\nスロット1〜5に保存したコードもすべて失われます。')) {
+        if (confirm('本当によろしいですか？この操作は取り消せません。')) {
+          localStorage.clear();
+          updateStorageInspector();
+          toast('すべてのストレージデータを初期化しました');
+        }
+      }
     }
 
-    // フルスクリーン表示（オーバーレイ内の iframe を差し替え）
-    function enterFullscreen() {
-      const html = document.getElementById('html-input').value;
-      const fullscreenIframe = document.getElementById('fullscreen-iframe');
-      const overlay = document.getElementById('fullscreen-overlay');
-
-      const newFrame = document.createElement('iframe');
-      newFrame.id = 'fullscreen-iframe';
-      newFrame.style.flex = '1';
-      newFrame.style.border = 'none';
-
-      fullscreenIframe.parentNode.replaceChild(newFrame, fullscreenIframe);
-
-      const blob = new Blob([html], { type: 'text/html' });
+    // ---------- ファイル保存・復元 ----------
+    function triggerDownload(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
       const url = URL.createObjectURL(blob);
-      newFrame.src = url;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
+    }
 
-      overlay.style.display = 'flex';
+    function downloadHTMLFile() {
+      const html = $('html-input').value;
+      if (!html.trim()) { toast('保存するHTMLコードが空です', true); return; }
+      let filename = $('file-name-input').value.trim() || 'app.html';
+      if (!filename.includes('.')) filename += '.html';
+      triggerDownload(html, filename, 'text/html;charset=utf-8');
+      toast(`「${filename}」を保存しました`);
+    }
 
-      setTimeout(() => URL.revokeObjectURL(url), 5000);
+    function downloadPackageFile() {
+      const html = $('html-input').value;
+      if (!html.trim()) { toast('保存するコードが空です', true); return; }
+      let filename = $('file-name-input').value.trim() || 'app_backup.json';
+      if (!filename.endsWith('.json')) filename = filename.replace(/\.[^/.]+$/, '') + '.json';
+
+      const { keys, dynamic } = analyzeKeys(html);
+      const storageData = {};
+      keys.forEach(k => {
+        if (isSlotKey(k)) return; // スロット用キーは対象外
+        const v = localStorage.getItem(k);
+        if (v !== null) storageData[k] = v;
+      });
+
+      const pkg = {
+        format: 'HTML_STUDIO_PACKAGE_V1',
+        exportedAt: new Date().toISOString(),
+        htmlCode: html,
+        storageData
+      };
+      triggerDownload(JSON.stringify(pkg, null, 2), filename, 'application/json;charset=utf-8');
+
+      const n = Object.keys(storageData).length;
+      toast(dynamic
+        ? `保存しました（データ${n}件）\n⚠️ 動的なキー名を使っているため、一部データが含まれていない可能性があります`
+        : `コードと関連データ（${n}件）を保存しました`, dynamic);
+    }
+
+    function triggerFileLoad() { $('file-loader').click(); }
+
+    function handleFileLoad(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onerror = () => { toast('ファイルの読み込みに失敗しました', true); event.target.value = ''; };
+      reader.onload = e => {
+        const content = e.target.result;
+        $('file-name-input').value = file.name;
+
+        if (file.name.endsWith('.json')) {
+          try {
+            const parsed = JSON.parse(content);
+            if (parsed.format === 'HTML_STUDIO_PACKAGE_V1' && typeof parsed.htmlCode === 'string') {
+              // スロット用キーは復元対象から除外
+              const dataKeys = Object.keys(parsed.storageData || {}).filter(k => !isSlotKey(k));
+              const msg = `パッケージファイルを検出しました。\n・HTMLコード\n・紐づくセーブデータ（${dataKeys.length}件: ${dataKeys.join(', ') || 'なし'}）\n\n現在のエディタと該当ストレージデータを上書き復元しますか？`;
+              if (confirm(msg)) {
+                $('html-input').value = parsed.htmlCode;
+                try {
+                  dataKeys.forEach(k => localStorage.setItem(k, String(parsed.storageData[k])));
+                  toast('HTMLコードとセーブデータを復元しました');
+                } catch (err) {
+                  toast('データの復元に失敗しました（容量上限の可能性）:\n' + err, true);
+                }
+                updateStorageInspector();
+              }
+              event.target.value = '';
+              return;
+            }
+          } catch (err) { /* 通常のテキストとして扱う */ }
+        }
+
+        if (confirm(`「${file.name}」をエディタに読み込みますか？（現在の入力内容は上書きされます）`)) {
+          $('html-input').value = content;
+          updateStorageInspector();
+          toast('読み込みました');
+        }
+        event.target.value = '';
+      };
+      reader.readAsText(file, 'UTF-8');
+    }
+
+    // ---------- スロット ----------
+    function saveCode() {
+      const slot = $('slot-select').value;
+      try {
+        localStorage.setItem(`html_${slot}`, $('html-input').value);
+        updateStorageInspector();
+        toast(`${slot}に保存しました`);
+      } catch (e) {
+        toast('保存に失敗しました（容量上限の可能性）:\n' + e, true);
+      }
+    }
+
+    function loadCode() {
+      const slot = $('slot-select').value;
+      const html = localStorage.getItem(`html_${slot}`);
+      if (html !== null) {
+        $('html-input').value = html;
+        updateStorageInspector();
+        toast(`${slot}から読み込みました`);
+      } else {
+        toast(`${slot}には保存されたコードがありません`, true);
+      }
+    }
+
+    // ---------- プレビュー（srcdoc：URL解放タイミング問題なし） ----------
+    function renderPreview() {
+      const frame = $('preview-frame');
+      frame.onload = () => setTimeout(updateStorageInspector, 500);
+      frame.srcdoc = $('html-input').value;
+    }
+
+    function enterFullscreen() {
+      const frame = $('fullscreen-iframe');
+      frame.srcdoc = $('html-input').value;
+      $('fullscreen-overlay').style.display = 'flex';
     }
 
     function exitFullscreen() {
-      document.getElementById('fullscreen-overlay').style.display = 'none';
+      $('fullscreen-overlay').style.display = 'none';
+      $('fullscreen-iframe').srcdoc = ''; // 実行中のアプリを停止
+      updateStorageInspector();
     }
 
-    // クリップボードへコピー（従来方式）
-    function copyCode() {
-      const textarea = document.getElementById('html-input');
-      textarea.select();
+    // ---------- 補助機能 ----------
+    async function copyCode() {
+      const ta = $('html-input');
       try {
-        document.execCommand('copy');
-        alert('コードをコピーしました！');
-      } catch (err) {
-        // フォールバック：navigator.clipboard が使える場合はそちらを試す
         if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(textarea.value).then(() => {
-            alert('コードをコピーしました！');
-          }).catch(e => {
-            alert('コピーに失敗しました: ' + e);
-          });
+          await navigator.clipboard.writeText(ta.value);
         } else {
-          alert('コピーに失敗しました（ブラウザが対応していない可能性があります）');
+          ta.select();
+          if (!document.execCommand('copy')) throw new Error('copy failed');
+          window.getSelection().removeAllRanges();
         }
-      }
-      // 選択解除（見た目のため）
-      try { window.getSelection().removeAllRanges(); } catch(e){}
-    }
-
-    // クリア：確認してから textarea を空にする
-    function clearCode() {
-      const textarea = document.getElementById('html-input');
-      if (confirm('入力内容をすべて消去しますか？')) {
-        textarea.value = '';
-      }
-    }
-
-    // ペースト：クリアしてからクリップボードのテキストを貼り付ける
-    async function pasteCode() {
-      const textarea = document.getElementById('html-input');
-
-      // クリア（仕様どおり最初にクリア）
-      textarea.value = '';
-
-      // navigator.clipboard.readText を使ってクリップボード読み取り
-      if (navigator.clipboard && navigator.clipboard.readText) {
+        toast('コードをコピーしました');
+      } catch (err) {
         try {
-          const text = await navigator.clipboard.readText();
-          textarea.value = text;
-          alert('クリップボードの内容を貼り付けました！');
-        } catch (err) {
-          // 失敗時の案内
-          alert('クリップボードの読み取りに失敗しました。\n' +
-                'ページが HTTPS でない場合や、ブラウザの権限が必要です。\n' +
-                'エラー: ' + err);
-        }
-      } else {
-        // 古いブラウザや権限のない環境向けのフォールバック案内
-        alert('このブラウザではクリップボード読み取りがサポートされていません。\n' +
-              '（HTTPS 環境か、別のブラウザでお試しください）');
+          ta.select();
+          if (document.execCommand('copy')) { toast('コードをコピーしました'); return; }
+        } catch (e2) {}
+        toast('コピーに失敗しました: ' + err, true);
       }
     }
 
-    // ページ読み込み時に簡単なヒントを表示（任意：不要なら削除可）
-    // window.addEventListener('load', () => {
-    //   console.log('ヒント: ペースト機能は HTTPS または localhost で動作します。');
-    // });
+    function clearCode() {
+      if (confirm('入力内容をすべて消去しますか？')) {
+        $('html-input').value = '';
+        updateStorageInspector();
+      }
+    }
 
+    async function pasteCode() {
+      if (!(navigator.clipboard && navigator.clipboard.readText)) {
+        toast('このブラウザではクリップボード読み取りがサポートされていません', true);
+        return;
+      }
+      try {
+        const text = await navigator.clipboard.readText(); // 読み取り成功後にだけ上書き
+        $('html-input').value = text;
+        updateStorageInspector();
+        toast('クリップボードの内容を貼り付けました');
+      } catch (err) {
+        toast('クリップボードの読み取りに失敗しました（入力内容は残しています）:\n' + err, true);
+      }
+    }
+
+    window.addEventListener('load', updateStorageInspector);
   </script>
-
 </body>
 </html>
